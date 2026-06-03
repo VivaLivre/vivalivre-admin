@@ -160,7 +160,7 @@ class _DashboardOverviewPageState extends State<DashboardOverviewPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 24),
-                                ...data.weeklyActivity.map((item) => _buildActivityBar(item)).toList(),
+                                ...data.weeklyActivity.map((item) => _buildActivityBar(item)),
                                 const SizedBox(height: 24),
                                 const Divider(),
                                 const SizedBox(height: 16),
@@ -202,7 +202,7 @@ class _DashboardOverviewPageState extends State<DashboardOverviewPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 24),
-                                ...data.recentActivities.map((activity) => _buildRecentActivityItem(activity)).toList(),
+                                ...data.recentActivities.map((activity) => _buildRecentActivityItem(activity)),
                               ],
                             ),
                           ),
@@ -227,7 +227,7 @@ class _DashboardOverviewPageState extends State<DashboardOverviewPage> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF2563EB).withOpacity(0.3),
+                        color: const Color(0xFF2563EB).withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -304,7 +304,7 @@ class _DashboardOverviewPageState extends State<DashboardOverviewPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: colors.first.withOpacity(0.3),
+            color: colors.first.withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -321,7 +321,7 @@ class _DashboardOverviewPageState extends State<DashboardOverviewPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: Colors.white, size: 24),
@@ -330,7 +330,7 @@ class _DashboardOverviewPageState extends State<DashboardOverviewPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(

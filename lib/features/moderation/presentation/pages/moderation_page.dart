@@ -267,7 +267,7 @@ class _ModerationPageState extends State<ModerationPage> {
           color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF3F4F6),
           borderRadius: BorderRadius.circular(8),
           boxShadow: isSelected
-              ? [BoxShadow(color: const Color(0xFF2563EB).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))]
+              ? [BoxShadow(color: const Color(0xFF2563EB).withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))]
               : null,
         ),
         child: Text(
@@ -295,7 +295,7 @@ class _ModerationPageState extends State<ModerationPage> {
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

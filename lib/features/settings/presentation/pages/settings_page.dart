@@ -271,7 +271,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: const Color(0xFF2563EB),
+              activeThumbColor: const Color(0xFF2563EB),
             ),
           ],
         ),
@@ -306,7 +306,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: isDestructive ? Colors.red.withOpacity(0.8) : Colors.black54,
+                      color: isDestructive ? Colors.red.withValues(alpha: 0.8) : Colors.black54,
                       fontSize: 14,
                     ),
                   ),

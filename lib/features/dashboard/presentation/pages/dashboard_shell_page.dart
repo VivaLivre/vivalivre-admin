@@ -134,7 +134,7 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                       borderRadius: BorderRadius.circular(8),
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
-                      hoverColor: Colors.black.withOpacity(0.04),
+                      hoverColor: Colors.black.withValues(alpha: 0.04),
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
@@ -143,7 +143,7 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                           boxShadow: isActive
                               ? [
                                   BoxShadow(
-                                    color: const Color(0xFF2563EB).withOpacity(0.3),
+                                    color: const Color(0xFF2563EB).withValues(alpha: 0.3),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   )
