@@ -23,6 +23,9 @@ import 'features/bathroom_management/domain/repositories/i_bathroom_management_r
 import 'features/bathroom_management/data/repositories/bathroom_management_repository_impl.dart';
 import 'features/bathroom_management/presentation/bloc/bathroom_crud_bloc.dart';
 import 'features/bathroom_management/presentation/pages/manage_bathrooms_page.dart';
+import 'features/users/domain/repositories/i_admin_user_repository.dart';
+import 'features/users/data/repositories/admin_user_repository_impl.dart';
+import 'features/users/presentation/bloc/users_bloc_impl.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/network/token_interceptor.dart';
@@ -65,6 +68,9 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<IBathroomManagementRepository>(
           create: (context) => BathroomManagementRepositoryImpl(dio),
         ),
+        RepositoryProvider<IAdminUserRepository>(
+          create: (context) => AdminUserRepositoryImpl(dio: dio),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -96,6 +102,11 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => BathroomCrudBloc(
               repository: context.read<IBathroomManagementRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => UsersBlocImpl(
+              repository: context.read<IAdminUserRepository>(),
             ),
           ),
         ],
