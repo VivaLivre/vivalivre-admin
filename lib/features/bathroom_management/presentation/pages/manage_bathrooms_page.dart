@@ -39,6 +39,8 @@ class _ManageBathroomsPageState extends State<ManageBathroomsPage> {
   }
 
   Future<void> _showFormDialog({Bathroom? bathroom}) async {
+    // Capture bloc before async gap to avoid use_build_context_synchronously
+    final bloc = context.read<BathroomCrudBloc>();
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       barrierDismissible: false,
@@ -48,10 +50,10 @@ class _ManageBathroomsPageState extends State<ManageBathroomsPage> {
     if (result != null) {
       if (bathroom == null) {
         // Create
-        context.read<BathroomCrudBloc>().add(CreateBathroomEvent(result));
+        bloc.add(CreateBathroomEvent(result));
       } else {
         // Update
-        context.read<BathroomCrudBloc>().add(UpdateBathroomEvent(bathroom.id, result));
+        bloc.add(UpdateBathroomEvent(bathroom.id, result));
       }
     }
   }

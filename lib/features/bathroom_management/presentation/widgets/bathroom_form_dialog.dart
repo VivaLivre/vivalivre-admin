@@ -31,7 +31,7 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
   bool _isFree = false;
 
   String _operatingHoursType = 'unknown';
-  Map<int, Map<String, String>> _customSchedule = {};
+  final Map<int, Map<String, String>> _customSchedule = {};
   String _status = 'approved';
   bool _isSearchingAddress = false;
 
@@ -424,7 +424,7 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
                           if (isEditing) ...[
                             const SizedBox(height: 16),
                             DropdownButtonFormField<String>(
-                              value: _status,
+                              initialValue: _status,
                               decoration: const InputDecoration(labelText: 'Status', border: OutlineInputBorder()),
                               items: const [
                                 DropdownMenuItem(value: 'approved', child: Text('Aprovado')),
