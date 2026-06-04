@@ -62,7 +62,9 @@ class BathroomCard extends StatelessWidget {
                     bathroom.photoUrl!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey.shade200,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF232634)
+                          : Colors.grey.shade200,
                       child: const Center(
                         child: Icon(Icons.broken_image, size: 48, color: Colors.grey),
                       ),
@@ -70,7 +72,9 @@ class BathroomCard extends StatelessWidget {
                   )
                 else
                   Container(
-                    color: Colors.grey.shade200,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF232634)
+                        : Colors.grey.shade200,
                     child: const Center(
                       child: Icon(Icons.image, size: 48, color: Colors.grey),
                     ),
@@ -117,7 +121,11 @@ class BathroomCard extends StatelessWidget {
                     bathroom.address,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8891A8)
+                          : Colors.grey.shade600,
+                    ),
                   ),
                   const Spacer(),
                   // Actions
@@ -125,7 +133,7 @@ class BathroomCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        icon: const Icon(Icons.edit, color: Color(0xFF2563EB)),
                         onPressed: onEdit,
                         tooltip: 'Editar',
                         constraints: const BoxConstraints(),
