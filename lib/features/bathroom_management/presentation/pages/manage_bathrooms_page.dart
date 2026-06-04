@@ -143,12 +143,13 @@ class _ManageBathroomsPageState extends State<ManageBathroomsPage> {
                           itemCount: meta.page == 1 ? bathrooms.length + 1 : bathrooms.length,
                           itemBuilder: (context, index) {
                             if (meta.page == 1 && index == 0) {
+                              final isDark = Theme.of(context).brightness == Brightness.dark;
                               return Card(
-                                color: Colors.blue.shade50,
+                                color: isDark ? const Color(0xFF1E2D4A) : Colors.blue.shade50,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
-                                  side: BorderSide(color: Colors.blue.shade200, width: 2, style: BorderStyle.solid),
+                                  side: BorderSide(color: isDark ? const Color(0xFF2563EB) : Colors.blue.shade200, width: 2),
                                 ),
                                 child: InkWell(
                                   onTap: () => _showFormDialog(),
@@ -157,9 +158,9 @@ class _ManageBathroomsPageState extends State<ManageBathroomsPage> {
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.add_circle_outline, size: 48, color: Colors.blue),
+                                        Icon(Icons.add_circle_outline, size: 48, color: Color(0xFF2563EB)),
                                         SizedBox(height: 8),
-                                        Text('Novo Banheiro', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16)),
+                                        Text('Novo Banheiro', style: TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold, fontSize: 16)),
                                       ],
                                     ),
                                   ),
@@ -180,44 +181,38 @@ class _ManageBathroomsPageState extends State<ManageBathroomsPage> {
                       ),
                       const SizedBox(height: 16),
                       // Pagination Controls
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: meta.page > 1
-                                ? () {
-                                    context.read<BathroomCrudBloc>().add(
-                                          FetchBathroomsEvent(
-                                            page: meta.page - 1,
-                                            limit: meta.limit,
-                                            search: state.searchQuery,
-                                          ),
-                                        );
-                                  }
-                                : null,
-                            icon: const Icon(Icons.chevron_left),
-                            label: const Text('Anterior'),
-                          ),
-                          const SizedBox(width: 16),
-                          Text('Página ${meta.page} de ${meta.totalPages}'),
-                          const SizedBox(width: 16),
-                          ElevatedButton.icon(
-                            onPressed: meta.page < meta.totalPages
-                                ? () {
-                                    context.read<BathroomCrudBloc>().add(
-                                          FetchBathroomsEvent(
-                                            page: meta.page + 1,
-                                            limit: meta.limit,
-                                            search: state.searchQuery,
-                                          ),
-                                        );
-                                  }
-                                : null,
-                            icon: const Icon(Icons.chevron_right),
-                            label: const Text('Próxima'),
-                          ),
-                        ],
-                      ),
+                      Builder(builder: (context) {
+                        final isDark = Theme.of(context).brightness == Brightness.dark;
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: meta.page > 1
+                                  ? () {
+                                      context.read<BathroomCrudBloc>().add(FetchBathroomsEvent(
+                                            page: meta.page - 1, limit: meta.limit, search: state.searchQuery));
+                                    }
+                                  : null,
+                              icon: const Icon(Icons.chevron_left),
+                              label: const Text('Anterior'),
+                            ),
+                            const SizedBox(width: 16),
+                            Text('P\u00e1gina ${meta.page} de ${meta.totalPages}',
+                                style: TextStyle(color: isDark ? const Color(0xFFCDD3E0) : null)),
+                            const SizedBox(width: 16),
+                            ElevatedButton.icon(
+                              onPressed: meta.page < meta.totalPages
+                                  ? () {
+                                      context.read<BathroomCrudBloc>().add(FetchBathroomsEvent(
+                                            page: meta.page + 1, limit: meta.limit, search: state.searchQuery));
+                                    }
+                                  : null,
+                              icon: const Icon(Icons.chevron_right),
+                              label: const Text('Pr\u00f3xima'),
+                            ),
+                          ],
+                        );
+                      }),
                     ],
                   );
                 }

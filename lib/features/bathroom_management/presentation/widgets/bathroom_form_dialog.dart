@@ -35,7 +35,7 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
   String _status = 'approved';
   bool _isSearchingAddress = false;
 
-  LatLng _selectedLocation = const LatLng(-23.5505, -46.6333); // Default SP
+  LatLng _selectedLocation = const LatLng(-23.5505, -46.6333);
   final MapController _mapController = MapController();
 
   @override
@@ -102,7 +102,8 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
   Future<Iterable<Map<String, dynamic>>> _searchAddress(String query) async {
     if (query.length < 3) return const Iterable<Map<String, dynamic>>.empty();
     try {
-      final uri = Uri.parse('https://nominatim.openstreetmap.org/search?q=$query&format=json&addressdetails=1&limit=5');
+      final uri = Uri.parse(
+          'https://nominatim.openstreetmap.org/search?q=$query&format=json&addressdetails=1&limit=5');
       final response = await http.get(uri);
       if (response.statusCode == 200) {
         final List data = jsonDecode(response.body);
@@ -116,7 +117,8 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
 
   Future<void> _reverseGeocode(double lat, double lng) async {
     try {
-      final uri = Uri.parse('https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lng&format=json&addressdetails=1');
+      final uri = Uri.parse(
+          'https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lng&format=json&addressdetails=1');
       final response = await http.get(uri);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -141,14 +143,17 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
       _mapController.move(_selectedLocation, 15.0);
       _reverseGeocode(lat, lng);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Coordenadas inválidas.'), backgroundColor: Colors.orange));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Coordenadas inválidas.'), backgroundColor: Colors.orange));
     }
   }
 
   Future<void> _searchAndMovePin() async {
     final query = _addressController.text;
     if (query.length < 3) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Digite pelo menos 3 caracteres para buscar.'), backgroundColor: Colors.orange));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Digite pelo menos 3 caracteres para buscar.'),
+          backgroundColor: Colors.orange));
       return;
     }
 
@@ -166,18 +171,18 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
             _lngController.text = lng.toStringAsFixed(6);
           });
           _mapController.move(_selectedLocation, 15.0);
-          
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Localização encontrada e atualizada no mapa!'), backgroundColor: Colors.green),
-            );
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Localização encontrada e atualizada no mapa!'),
+                backgroundColor: Colors.green));
           }
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Endereço não encontrado. Por favor, marque manualmente no mapa.'), backgroundColor: Colors.orange),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(
+                  'Endereço não encontrado. Por favor, marque manualmente no mapa.'),
+              backgroundColor: Colors.orange));
         }
       }
     } finally {
@@ -192,8 +197,11 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
       final Map<String, dynamic> data = {
         'name': _nameController.text,
         'address': _addressController.text,
-        'latitude': double.tryParse(_latController.text.replaceAll(',', '.')) ?? _selectedLocation.latitude,
-        'longitude': double.tryParse(_lngController.text.replaceAll(',', '.')) ?? _selectedLocation.longitude,
+        'latitude': double.tryParse(_latController.text.replaceAll(',', '.')) ??
+            _selectedLocation.latitude,
+        'longitude':
+            double.tryParse(_lngController.text.replaceAll(',', '.')) ??
+                _selectedLocation.longitude,
         'is_accessible': _isAccessible,
         'has_changing_table': _hasChangingTable,
         'is_free': _isFree,
@@ -223,22 +231,29 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
 
       Navigator.of(context).pop(data);
     } else {
-      // Feedback visual caso o formulário seja inválido
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, preencha todos os campos obrigatórios corretamente.'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content:
+            Text('Por favor, preencha todos os campos obrigatórios corretamente.'),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isEditing = widget.bathroom != null;
 
+    // ── Token colors ─────────────────────────────────────────────────────
+    final dialogBg = isDark ? const Color(0xFF1A1D27) : Colors.white;
+    final dividerColor = isDark ? const Color(0xFF2E3347) : null;
+    final hintColor = isDark ? const Color(0xFF8891A8) : Colors.grey;
+    final primaryText = isDark ? const Color(0xFFF1F3F9) : null;
+
     return Dialog(
+      backgroundColor: dialogBg,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: 800,
@@ -246,70 +261,86 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
+            // ── Header ──────────────────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   isEditing ? 'Editar Banheiro' : 'Novo Banheiro',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.bold, color: primaryText),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: Icon(Icons.close, color: isDark ? const Color(0xFF8891A8) : null),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const Divider(),
+            Divider(color: dividerColor),
+
+            // ── Body ─────────────────────────────────────────────────────
             Expanded(
               child: Form(
                 key: _formKey,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Coluna Esquerda: Campos
+                    // ── Left Column: Fields ──────────────────────────────
                     Expanded(
                       flex: 1,
                       child: ListView(
                         padding: const EdgeInsets.only(right: 16),
                         children: [
-                          TextFormField(
+                          _themedField(
                             controller: _nameController,
-                            decoration: const InputDecoration(labelText: 'Nome', border: OutlineInputBorder()),
-                            validator: (val) => val == null || val.isEmpty ? 'Obrigatório' : null,
+                            label: 'Nome',
+                            isDark: isDark,
+                            validator: (val) =>
+                                val == null || val.isEmpty ? 'Obrigatório' : null,
                           ),
                           const SizedBox(height: 16),
-                          TextFormField(
+                          _themedField(
                             controller: _addressController,
-                            decoration: const InputDecoration(labelText: 'Endereço', border: OutlineInputBorder()),
-                            validator: (val) => val == null || val.isEmpty ? 'Obrigatório' : null,
+                            label: 'Endereço',
+                            isDark: isDark,
+                            validator: (val) =>
+                                val == null || val.isEmpty ? 'Obrigatório' : null,
                           ),
                           const SizedBox(height: 8),
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
                               onPressed: _isSearchingAddress ? null : _searchAndMovePin,
-                              icon: _isSearchingAddress ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.search),
+                              icon: _isSearchingAddress
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2))
+                                  : const Icon(Icons.search),
                               label: const Text('Buscar Localização no Mapa'),
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                              ),
+                                  padding: const EdgeInsets.symmetric(vertical: 12)),
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Dica: Se o endereço não for encontrado na busca, digite-o e clique manualmente no mapa ao lado para marcar a posição exata.',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          Text(
+                            'Dica: Se o endereço não for encontrado na busca, clique manualmente no mapa ao lado para marcar a posição exata.',
+                            style: TextStyle(fontSize: 12, color: hintColor),
                           ),
                           const SizedBox(height: 16),
+                          // Lat/Lng row
                           Row(
                             children: [
                               Expanded(
-                                child: TextFormField(
+                                child: _themedField(
                                   controller: _latController,
-                                  decoration: const InputDecoration(labelText: 'Latitude', border: OutlineInputBorder()),
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                                  label: 'Latitude',
+                                  isDark: isDark,
+                                  keyboardType: const TextInputType.numberWithOptions(
+                                      decimal: true, signed: true),
                                   onChanged: (value) {
-                                    final coordExp = RegExp(r'^(-?\d+\.\d+)[\s,]+(-?\d+\.\d+)$');
+                                    final coordExp = RegExp(
+                                        r'^(-?\d+\.\d+)[\s,]+(-?\d+\.\d+)$');
                                     final match = coordExp.firstMatch(value.trim());
                                     if (match != null) {
                                       _latController.text = match.group(1)!;
@@ -321,12 +352,15 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: TextFormField(
+                                child: _themedField(
                                   controller: _lngController,
-                                  decoration: const InputDecoration(labelText: 'Longitude', border: OutlineInputBorder()),
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                                  label: 'Longitude',
+                                  isDark: isDark,
+                                  keyboardType: const TextInputType.numberWithOptions(
+                                      decimal: true, signed: true),
                                   onChanged: (value) {
-                                    final coordExp = RegExp(r'^(-?\d+\.\d+)[\s,]+(-?\d+\.\d+)$');
+                                    final coordExp = RegExp(
+                                        r'^(-?\d+\.\d+)[\s,]+(-?\d+\.\d+)$');
                                     final match = coordExp.firstMatch(value.trim());
                                     if (match != null) {
                                       _latController.text = match.group(1)!;
@@ -339,93 +373,74 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
                               const SizedBox(width: 8),
                               ElevatedButton(
                                 onPressed: _movePinFromLatLng,
-                                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                                style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 16)),
                                 child: const Icon(Icons.location_on),
                               ),
                             ],
                           ),
                           const SizedBox(height: 16),
+                          // Photo URL + picker
                           Row(
                             children: [
                               Expanded(
-                                child: TextFormField(
+                                child: _themedField(
                                   controller: _photoUrlController,
-                                  decoration: const InputDecoration(labelText: 'URL da Foto (opcional)', border: OutlineInputBorder()),
+                                  label: 'URL da Foto (opcional)',
+                                  isDark: isDark,
                                 ),
                               ),
                               const SizedBox(width: 8),
                               ElevatedButton.icon(
                                 onPressed: _pickImage,
                                 icon: const Icon(Icons.attach_file),
-                                label: Text(_selectedPhotoFile != null ? 'Trocar Anexo' : 'Anexar Foto'),
+                                label: Text(_selectedPhotoFile != null
+                                    ? 'Trocar Anexo'
+                                    : 'Anexar Foto'),
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                                ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16, horizontal: 16)),
                               ),
                             ],
                           ),
                           if (_selectedPhotoFile != null) ...[
                             const SizedBox(height: 8),
-                            Text('Anexo: ${_selectedPhotoFile!.name}', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                            Text('Anexo: ${_selectedPhotoFile!.name}',
+                                style: const TextStyle(
+                                    color: Color(0xFF10B981),
+                                    fontWeight: FontWeight.bold)),
                           ],
                           const SizedBox(height: 16),
+
+                          // ── Operating Hours selector ──────────────────
                           Row(
                             children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () => setState(() => _operatingHoursType = 'unknown'),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: _operatingHoursType == 'unknown' ? Colors.blue.withValues(alpha: 0.1) : Colors.transparent,
-                                      border: Border.all(color: _operatingHoursType == 'unknown' ? Colors.blue : Colors.grey),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(child: Text('Desconhecido', style: TextStyle(color: _operatingHoursType == 'unknown' ? Colors.blue : Colors.black))),
-                                  ),
-                                ),
-                              ),
+                              _buildHoursTypeButton('Desconhecido', 'unknown', isDark),
                               const SizedBox(width: 8),
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () => setState(() => _operatingHoursType = '24h'),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: _operatingHoursType == '24h' ? Colors.blue.withValues(alpha: 0.1) : Colors.transparent,
-                                      border: Border.all(color: _operatingHoursType == '24h' ? Colors.blue : Colors.grey),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(child: Text('24 Horas', style: TextStyle(color: _operatingHoursType == '24h' ? Colors.blue : Colors.black))),
-                                  ),
-                                ),
-                              ),
+                              _buildHoursTypeButton('24 Horas', '24h', isDark),
                               const SizedBox(width: 8),
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () => setState(() => _operatingHoursType = 'custom'),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: _operatingHoursType == 'custom' ? Colors.blue.withValues(alpha: 0.1) : Colors.transparent,
-                                      border: Border.all(color: _operatingHoursType == 'custom' ? Colors.blue : Colors.grey),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(child: Text('Personalizado', style: TextStyle(color: _operatingHoursType == 'custom' ? Colors.blue : Colors.black))),
-                                  ),
-                                ),
-                              ),
+                              _buildHoursTypeButton('Personalizado', 'custom', isDark),
                             ],
                           ),
                           if (_operatingHoursType == 'custom') ...[
                             const SizedBox(height: 16),
-                            _buildCustomScheduleEditor(),
+                            _buildCustomScheduleEditor(isDark),
                           ],
                           if (isEditing) ...[
                             const SizedBox(height: 16),
                             DropdownButtonFormField<String>(
                               initialValue: _status,
-                              decoration: const InputDecoration(labelText: 'Status', border: OutlineInputBorder()),
+                              dropdownColor: isDark ? const Color(0xFF232634) : null,
+                              style: TextStyle(color: isDark ? const Color(0xFFF1F3F9) : null),
+                              decoration: InputDecoration(
+                                labelText: 'Status',
+                                labelStyle: TextStyle(color: isDark ? const Color(0xFF8891A8) : null),
+                                border: const OutlineInputBorder(),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: isDark ? const Color(0xFF2E3347) : Colors.grey.shade400),
+                                ),
+                              ),
                               items: const [
                                 DropdownMenuItem(value: 'approved', child: Text('Aprovado')),
                                 DropdownMenuItem(value: 'pending', child: Text('Pendente')),
@@ -436,30 +451,40 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
                           ],
                           const SizedBox(height: 16),
                           SwitchListTile(
-                            title: const Text('Acessível (PCD)'),
+                            title: Text('Acessível (PCD)',
+                                style: TextStyle(color: primaryText)),
                             value: _isAccessible,
+                            activeThumbColor: const Color(0xFF2563EB),
                             onChanged: (val) => setState(() => _isAccessible = val),
                           ),
                           SwitchListTile(
-                            title: const Text('Tem Trocador'),
+                            title: Text('Tem Trocador',
+                                style: TextStyle(color: primaryText)),
                             value: _hasChangingTable,
+                            activeThumbColor: const Color(0xFF2563EB),
                             onChanged: (val) => setState(() => _hasChangingTable = val),
                           ),
                           SwitchListTile(
-                            title: const Text('Gratuito'),
+                            title: Text('Gratuito', style: TextStyle(color: primaryText)),
                             value: _isFree,
+                            activeThumbColor: const Color(0xFF2563EB),
                             onChanged: (val) => setState(() => _isFree = val),
                           ),
                         ],
                       ),
                     ),
-                    // Coluna Direita: Mapa
+
+                    // ── Right Column: Map ────────────────────────────────
                     Expanded(
                       flex: 1,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text('Localização (Arraste ou clique)', style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(
+                            'Localização (Arraste ou clique)',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, color: primaryText),
+                          ),
                           const SizedBox(height: 8),
                           Expanded(
                             child: ClipRRect(
@@ -472,15 +497,19 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
                                   onTap: (tapPosition, point) {
                                     setState(() {
                                       _selectedLocation = point;
-                                      _latController.text = point.latitude.toStringAsFixed(6);
-                                      _lngController.text = point.longitude.toStringAsFixed(6);
+                                      _latController.text =
+                                          point.latitude.toStringAsFixed(6);
+                                      _lngController.text =
+                                          point.longitude.toStringAsFixed(6);
                                     });
-                                    _reverseGeocode(point.latitude, point.longitude);
+                                    _reverseGeocode(
+                                        point.latitude, point.longitude);
                                   },
                                 ),
                                 children: [
                                   TileLayer(
-                                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                    urlTemplate:
+                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                     userAgentPackageName: 'com.vivalivre.admin',
                                   ),
                                   MarkerLayer(
@@ -502,8 +531,11 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text('Lat: ${_selectedLocation.latitude.toStringAsFixed(5)}, Lng: ${_selectedLocation.longitude.toStringAsFixed(5)}',
-                              style: Theme.of(context).textTheme.bodySmall),
+                          Text(
+                            'Lat: ${_selectedLocation.latitude.toStringAsFixed(5)}, Lng: ${_selectedLocation.longitude.toStringAsFixed(5)}',
+                            style: theme.textTheme.bodySmall
+                                ?.copyWith(color: hintColor),
+                          ),
                         ],
                       ),
                     ),
@@ -511,19 +543,23 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
                 ),
               ),
             ),
-            const Divider(),
+
+            // ── Footer ───────────────────────────────────────────────────
+            Divider(color: dividerColor),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancelar'),
+                  child: Text('Cancelar',
+                      style: TextStyle(
+                          color: isDark ? const Color(0xFF8891A8) : null)),
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: const Color(0xFF2563EB),
                     foregroundColor: Colors.white,
                   ),
                   child: const Text('Salvar'),
@@ -536,7 +572,80 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
     );
   }
 
-  Widget _buildCustomScheduleEditor() {
+  // ── Helper: themed TextFormField ──────────────────────────────────────────
+  Widget _themedField({
+    required TextEditingController controller,
+    required String label,
+    required bool isDark,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    void Function(String)? onChanged,
+  }) {
+    return TextFormField(
+      controller: controller,
+      validator: validator,
+      keyboardType: keyboardType,
+      onChanged: onChanged,
+      style: TextStyle(color: isDark ? const Color(0xFFF1F3F9) : null),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle:
+            TextStyle(color: isDark ? const Color(0xFF8891A8) : null),
+        border: const OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+              color: isDark ? const Color(0xFF2E3347) : Colors.grey.shade400),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF2563EB), width: 2),
+        ),
+        filled: isDark,
+        fillColor: isDark ? const Color(0xFF232634) : null,
+      ),
+    );
+  }
+
+  // ── Helper: operating hours type button ──────────────────────────────────
+  Widget _buildHoursTypeButton(String label, String value, bool isDark) {
+    final isSelected = _operatingHoursType == value;
+    const blue = Color(0xFF2563EB);
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _operatingHoursType = value),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? (isDark
+                    ? const Color(0xFF1E2D4A)
+                    : blue.withValues(alpha: 0.1))
+                : Colors.transparent,
+            border: Border.all(
+                color: isSelected
+                    ? blue
+                    : (isDark ? const Color(0xFF2E3347) : Colors.grey)),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isSelected
+                    ? blue
+                    : (isDark ? const Color(0xFF8891A8) : Colors.black87),
+                fontWeight:
+                    isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Custom schedule editor ────────────────────────────────────────────────
+  Widget _buildCustomScheduleEditor(bool isDark) {
     const days = {
       1: 'Segunda',
       2: 'Terça',
@@ -547,34 +656,53 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
       7: 'Domingo',
     };
 
+    final containerBg =
+        isDark ? const Color(0xFF0F1117) : Colors.grey.shade50;
+    final containerBorder =
+        isDark ? const Color(0xFF2E3347) : Colors.grey.shade300;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: containerBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: containerBorder),
       ),
       child: Column(
         children: days.entries.map((entry) {
           final day = entry.key;
           final name = entry.value;
           final isOpen = _customSchedule.containsKey(day);
-          final openTime = isOpen ? _customSchedule[day]!['open']! : '08:00';
-          final closeTime = isOpen ? _customSchedule[day]!['close']! : '18:00';
+          final openTime =
+              isOpen ? _customSchedule[day]!['open']! : '08:00';
+          final closeTime =
+              isOpen ? _customSchedule[day]!['close']! : '18:00';
           final isLast = day == 7;
 
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              border: isLast ? null : Border(bottom: BorderSide(color: Colors.grey.shade300)),
+              border: isLast
+                  ? null
+                  : Border(
+                      bottom: BorderSide(color: containerBorder)),
             ),
             child: Row(
               children: [
                 Checkbox(
                   value: isOpen,
+                  activeColor: const Color(0xFF2563EB),
+                  side: BorderSide(
+                      color: isDark
+                          ? const Color(0xFF2E3347)
+                          : Colors.grey.shade400),
                   onChanged: (val) {
                     setState(() {
                       if (val == true) {
-                        _customSchedule[day] = {'open': '08:00', 'close': '18:00'};
+                        _customSchedule[day] = {
+                          'open': '08:00',
+                          'close': '18:00'
+                        };
                       } else {
                         _customSchedule.remove(day);
                       }
@@ -583,12 +711,31 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
                 ),
                 SizedBox(
                   width: 70,
-                  child: Text(name, style: TextStyle(fontWeight: FontWeight.w600, color: isOpen ? Colors.black : Colors.grey)),
+                  child: Text(
+                    name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: isOpen
+                          ? (isDark
+                              ? const Color(0xFFF1F3F9)
+                              : Colors.black)
+                          : (isDark
+                              ? const Color(0xFF8891A8)
+                              : Colors.grey),
+                    ),
+                  ),
                 ),
                 const Spacer(),
-                _buildTimeButton(day, openTime, isOpen, true),
-                const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text('-')),
-                _buildTimeButton(day, closeTime, isOpen, false),
+                _buildTimeButton(day, openTime, isOpen, true, isDark),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text('-',
+                      style: TextStyle(
+                          color: isDark
+                              ? const Color(0xFF8891A8)
+                              : null)),
+                ),
+                _buildTimeButton(day, closeTime, isOpen, false, isDark),
               ],
             ),
           );
@@ -597,40 +744,63 @@ class _BathroomFormDialogState extends State<BathroomFormDialog> {
     );
   }
 
-  Widget _buildTimeButton(int day, String time, bool isEnabled, bool isStart) {
+  Widget _buildTimeButton(
+      int day, String time, bool isEnabled, bool isStart, bool isDark) {
     return InkWell(
-      onTap: isEnabled ? () async {
-        final initialParts = time.split(':');
-        final initialTime = TimeOfDay(
-          hour: int.tryParse(initialParts[0]) ?? 8,
-          minute: int.tryParse(initialParts[1]) ?? 0,
-        );
+      onTap: isEnabled
+          ? () async {
+              final initialParts = time.split(':');
+              final initialTime = TimeOfDay(
+                hour: int.tryParse(initialParts[0]) ?? 8,
+                minute: int.tryParse(initialParts[1]) ?? 0,
+              );
 
-        final selected = await showTimePicker(
-          context: context,
-          initialTime: initialTime,
-          builder: (context, child) => MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!),
-        );
+              final selected = await showTimePicker(
+                context: context,
+                initialTime: initialTime,
+                builder: (context, child) => MediaQuery(
+                    data: MediaQuery.of(context)
+                        .copyWith(alwaysUse24HourFormat: true),
+                    child: child!),
+              );
 
-        if (selected != null) {
-          final newTime = '${selected.hour.toString().padLeft(2, '0')}:${selected.minute.toString().padLeft(2, '0')}';
-          setState(() {
-            if (isStart) {
-              _customSchedule[day]!['open'] = newTime;
-            } else {
-              _customSchedule[day]!['close'] = newTime;
+              if (selected != null) {
+                final newTime =
+                    '${selected.hour.toString().padLeft(2, '0')}:${selected.minute.toString().padLeft(2, '0')}';
+                setState(() {
+                  if (isStart) {
+                    _customSchedule[day]!['open'] = newTime;
+                  } else {
+                    _customSchedule[day]!['close'] = newTime;
+                  }
+                });
+              }
             }
-          });
-        }
-      } : null,
+          : null,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isEnabled ? Colors.white : Colors.grey.shade200,
+          color: isEnabled
+              ? (isDark ? const Color(0xFF232634) : Colors.white)
+              : (isDark
+                  ? const Color(0xFF1A1D27)
+                  : Colors.grey.shade200),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: isEnabled ? Colors.grey.shade400 : Colors.transparent),
+          border: Border.all(
+              color: isEnabled
+                  ? (isDark
+                      ? const Color(0xFF2E3347)
+                      : Colors.grey.shade400)
+                  : Colors.transparent),
         ),
-        child: Text(time, style: TextStyle(color: isEnabled ? Colors.black : Colors.grey)),
+        child: Text(
+          time,
+          style: TextStyle(
+            color: isEnabled
+                ? (isDark ? const Color(0xFFF1F3F9) : Colors.black)
+                : (isDark ? const Color(0xFF8891A8) : Colors.grey),
+          ),
+        ),
       ),
     );
   }

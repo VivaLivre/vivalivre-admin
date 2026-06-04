@@ -24,25 +24,32 @@ class _CrowdsourceModerationPageState extends State<CrowdsourceModerationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final appBarBg = isDark ? const Color(0xFF1A1D27) : Colors.white;
+    final scaffoldBg = isDark ? const Color(0xFF0F1117) : const Color(0xFFF8FAFC);
+    final borderColor = isDark ? const Color(0xFF2E3347) : Colors.transparent;
+    final titleColor = isDark ? const Color(0xFFF1F3F9) : const Color(0xFF1E293B);
+    final unselectedTabColor = isDark ? const Color(0xFF8891A8) : const Color(0xFF64748B);
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: scaffoldBg,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: appBarBg,
           elevation: 0,
-          title: const Text(
+          title: Text(
             'Moderação da Comunidade',
-            style: TextStyle(
-              color: Color(0xFF1E293B),
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: titleColor, fontWeight: FontWeight.bold),
           ),
-          bottom: const TabBar(
-            labelColor: Color(0xFF2563EB),
-            unselectedLabelColor: Color(0xFF64748B),
-            indicatorColor: Color(0xFF2563EB),
-            tabs: [
+          bottom: TabBar(
+            labelColor: const Color(0xFF2563EB),
+            unselectedLabelColor: unselectedTabColor,
+            indicatorColor: const Color(0xFF2563EB),
+            dividerColor: borderColor,
+            tabs: const [
               Tab(text: 'Reportes'),
               Tab(text: 'Sugestões'),
             ],
@@ -58,57 +65,68 @@ class _CrowdsourceModerationPageState extends State<CrowdsourceModerationPage> {
           },
           builder: (context, state) {
             if (state is CrowdsourceLoading && state is! CrowdsourceLoaded) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(child: CircularProgressIndicator(color: theme.colorScheme.primary));
             }
-
             if (state is CrowdsourceLoaded) {
               return TabBarView(
                 children: [
-                  _buildReportsTab(state.reports),
-                  _buildSuggestionsTab(state.suggestions),
+                  _buildReportsTab(state.reports, isDark, theme),
+                  _buildSuggestionsTab(state.suggestions, isDark, theme),
                 ],
               );
             }
-
-            return const Center(child: Text('Nenhum dado encontrado.'));
+            return Center(child: Text('Nenhum dado encontrado.', style: theme.textTheme.bodyMedium));
           },
         ),
       ),
     );
   }
 
-  Widget _buildReportsTab(List<BathroomReport> reports) {
+  Widget _buildReportsTab(List<BathroomReport> reports, bool isDark, ThemeData theme) {
     final pendingReports = reports.where((r) => r.status == 'pending').toList();
     final inProgressReports = reports.where((r) => r.status == 'in_progress').toList();
 
     if (pendingReports.isEmpty && inProgressReports.isEmpty) {
-      return const Center(child: Text('Não há reportes ativos.'));
+      return Center(child: Text('Não há reportes ativos.', style: theme.textTheme.bodyMedium));
     }
+
+    final primaryText = isDark ? const Color(0xFFF1F3F9) : const Color(0xFF1E293B);
+    final secondaryText = isDark ? const Color(0xFF8891A8) : const Color(0xFF64748B);
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         if (inProgressReports.isNotEmpty) ...[
-          const Text('Minhas Tarefas (Em Andamento)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2563EB))),
+          Text('Minhas Tarefas (Em Andamento)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF2563EB))),
           const SizedBox(height: 12),
-          ...inProgressReports.map((report) => _buildReportCard(report, isInProgress: true)),
+          ...inProgressReports.map((r) => _buildReportCard(r, isInProgress: true, isDark: isDark, primaryText: primaryText, secondaryText: secondaryText)),
           const SizedBox(height: 24),
         ],
         if (pendingReports.isNotEmpty) ...[
-          const Text('Novos Reportes (Pendentes)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+          Text('Novos Reportes (Pendentes)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryText)),
           const SizedBox(height: 12),
-          ...pendingReports.map((report) => _buildReportCard(report, isInProgress: false)),
+          ...pendingReports.map((r) => _buildReportCard(r, isInProgress: false, isDark: isDark, primaryText: primaryText, secondaryText: secondaryText)),
         ],
       ],
     );
   }
 
-  Widget _buildReportCard(BathroomReport report, {required bool isInProgress}) {
+  Widget _buildReportCard(BathroomReport report, {
+    required bool isInProgress,
+    required bool isDark,
+    required Color primaryText,
+    required Color secondaryText,
+  }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
+      color: isDark ? const Color(0xFF1A1D27) : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: isInProgress ? const BorderSide(color: Color(0xFF2563EB), width: 2) : BorderSide.none,
+        side: isInProgress
+            ? const BorderSide(color: Color(0xFF2563EB), width: 2)
+            : BorderSide(color: isDark ? const Color(0xFF2E3347) : Colors.transparent),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -118,25 +136,29 @@ class _CrowdsourceModerationPageState extends State<CrowdsourceModerationPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  report.bathroomName ?? 'Banheiro Desconhecido',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                Expanded(
+                  child: Text(
+                    report.bathroomName ?? 'Banheiro Desconhecido',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryText),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 Text(
-                  '${report.createdAt.day.toString().padLeft(2, '0')}/${report.createdAt.month.toString().padLeft(2, '0')}/${report.createdAt.year} ${report.createdAt.hour.toString().padLeft(2, '0')}:${report.createdAt.minute.toString().padLeft(2, '0')}',
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  '${report.createdAt.day.toString().padLeft(2, '0')}/${report.createdAt.month.toString().padLeft(2, '0')}/${report.createdAt.year}',
+                  style: TextStyle(color: secondaryText, fontSize: 12),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            Text('Motivo: ${report.reason}', style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text('Motivo: ${report.reason}', style: TextStyle(fontWeight: FontWeight.w600, color: primaryText)),
             if (report.description != null && report.description!.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
-                child: Text('Descrição: ${report.description}'),
+                child: Text('Descrição: ${report.description}', style: TextStyle(color: secondaryText)),
               ),
             const SizedBox(height: 8),
-            Text('Reportado por: ${report.userEmail ?? "Desconhecido"}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            Text('Reportado por: ${report.userEmail ?? "Desconhecido"}',
+                style: TextStyle(color: secondaryText, fontSize: 12)),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -144,11 +166,8 @@ class _CrowdsourceModerationPageState extends State<CrowdsourceModerationPage> {
                 TextButton(
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                   onPressed: () {
-                    if (isInProgress) {
-                      context.read<CrowdsourceBloc>().add(UpdateReportStatusEvent(report.id, 'pending'));
-                    } else {
-                      context.read<CrowdsourceBloc>().add(UpdateReportStatusEvent(report.id, 'rejected'));
-                    }
+                    context.read<CrowdsourceBloc>().add(UpdateReportStatusEvent(
+                          report.id, isInProgress ? 'pending' : 'rejected'));
                   },
                   child: Text(isInProgress ? 'Desistir' : 'Rejeitar'),
                 ),
@@ -156,61 +175,72 @@ class _CrowdsourceModerationPageState extends State<CrowdsourceModerationPage> {
                 if (!isInProgress)
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                    onPressed: () {
-                      context.read<CrowdsourceBloc>().add(UpdateReportStatusEvent(report.id, 'in_progress'));
-                    },
+                    onPressed: () => context.read<CrowdsourceBloc>().add(UpdateReportStatusEvent(report.id, 'in_progress')),
                     child: const Text('Aceitar Tarefa', style: TextStyle(color: Colors.white)),
                   )
                 else
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                    onPressed: () {
-                      context.read<CrowdsourceBloc>().add(UpdateReportStatusEvent(report.id, 'resolved'));
-                    },
+                    onPressed: () => context.read<CrowdsourceBloc>().add(UpdateReportStatusEvent(report.id, 'resolved')),
                     child: const Text('Marcar Resolvido', style: TextStyle(color: Colors.white)),
                   ),
               ],
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSuggestionsTab(List<BathroomSuggestion> suggestions) {
+  Widget _buildSuggestionsTab(List<BathroomSuggestion> suggestions, bool isDark, ThemeData theme) {
     final pendingSuggestions = suggestions.where((s) => s.status == 'pending').toList();
     final inProgressSuggestions = suggestions.where((s) => s.status == 'in_progress').toList();
 
     if (pendingSuggestions.isEmpty && inProgressSuggestions.isEmpty) {
-      return const Center(child: Text('Não há sugestões ativas.'));
+      return Center(child: Text('Não há sugestões ativas.', style: theme.textTheme.bodyMedium));
     }
+
+    final primaryText = isDark ? const Color(0xFFF1F3F9) : const Color(0xFF1E293B);
+    final secondaryText = isDark ? const Color(0xFF8891A8) : const Color(0xFF64748B);
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         if (inProgressSuggestions.isNotEmpty) ...[
-          const Text('Minhas Tarefas (Em Andamento)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2563EB))),
+          Text('Minhas Tarefas (Em Andamento)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF2563EB))),
           const SizedBox(height: 12),
-          ...inProgressSuggestions.map((suggestion) => _buildSuggestionCard(suggestion, isInProgress: true)),
+          ...inProgressSuggestions.map((s) => _buildSuggestionCard(s, isInProgress: true, isDark: isDark, primaryText: primaryText, secondaryText: secondaryText)),
           const SizedBox(height: 24),
         ],
         if (pendingSuggestions.isNotEmpty) ...[
-          const Text('Novas Sugestões (Pendentes)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+          Text('Novas Sugestões (Pendentes)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryText)),
           const SizedBox(height: 12),
-          ...pendingSuggestions.map((suggestion) => _buildSuggestionCard(suggestion, isInProgress: false)),
+          ...pendingSuggestions.map((s) => _buildSuggestionCard(s, isInProgress: false, isDark: isDark, primaryText: primaryText, secondaryText: secondaryText)),
         ],
       ],
     );
   }
 
-  Widget _buildSuggestionCard(BathroomSuggestion suggestion, {required bool isInProgress}) {
+  Widget _buildSuggestionCard(BathroomSuggestion suggestion, {
+    required bool isInProgress,
+    required bool isDark,
+    required Color primaryText,
+    required Color secondaryText,
+  }) {
     final updatesPretty = const JsonEncoder.withIndent('  ').convert(suggestion.suggestedUpdates);
+    final codeBg = isDark ? const Color(0xFF0F1117) : Colors.grey[100];
+    final codeText = isDark ? const Color(0xFF34D399) : Colors.black87;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
+      color: isDark ? const Color(0xFF1A1D27) : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: isInProgress ? const BorderSide(color: Color(0xFF2563EB), width: 2) : BorderSide.none,
+        side: isInProgress
+            ? const BorderSide(color: Color(0xFF2563EB), width: 2)
+            : BorderSide(color: isDark ? const Color(0xFF2E3347) : Colors.transparent),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -220,33 +250,34 @@ class _CrowdsourceModerationPageState extends State<CrowdsourceModerationPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  suggestion.bathroomName ?? 'Banheiro Desconhecido',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                Expanded(
+                  child: Text(
+                    suggestion.bathroomName ?? 'Banheiro Desconhecido',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryText),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 Text(
-                  '${suggestion.createdAt.day.toString().padLeft(2, '0')}/${suggestion.createdAt.month.toString().padLeft(2, '0')}/${suggestion.createdAt.year} ${suggestion.createdAt.hour.toString().padLeft(2, '0')}:${suggestion.createdAt.minute.toString().padLeft(2, '0')}',
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  '${suggestion.createdAt.day.toString().padLeft(2, '0')}/${suggestion.createdAt.month.toString().padLeft(2, '0')}/${suggestion.createdAt.year}',
+                  style: TextStyle(color: secondaryText, fontSize: 12),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            const Text('Alterações Propostas:', style: TextStyle(fontWeight: FontWeight.w600)),
+            Text('Alterações Propostas:', style: TextStyle(fontWeight: FontWeight.w600, color: primaryText)),
             const SizedBox(height: 4),
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-              ),
+              decoration: BoxDecoration(color: codeBg, borderRadius: BorderRadius.circular(8)),
               width: double.infinity,
               child: Text(
                 updatesPretty,
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: codeText),
               ),
             ),
             const SizedBox(height: 8),
-            Text('Sugerido por: ${suggestion.userEmail ?? "Desconhecido"}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            Text('Sugerido por: ${suggestion.userEmail ?? "Desconhecido"}',
+                style: TextStyle(color: secondaryText, fontSize: 12)),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -254,11 +285,8 @@ class _CrowdsourceModerationPageState extends State<CrowdsourceModerationPage> {
                 TextButton(
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                   onPressed: () {
-                    if (isInProgress) {
-                      context.read<CrowdsourceBloc>().add(UpdateSuggestionStatusEvent(suggestion.id, 'pending'));
-                    } else {
-                      context.read<CrowdsourceBloc>().add(UpdateSuggestionStatusEvent(suggestion.id, 'rejected'));
-                    }
+                    context.read<CrowdsourceBloc>().add(UpdateSuggestionStatusEvent(
+                        suggestion.id, isInProgress ? 'pending' : 'rejected'));
                   },
                   child: Text(isInProgress ? 'Desistir' : 'Rejeitar'),
                 ),
@@ -266,21 +294,17 @@ class _CrowdsourceModerationPageState extends State<CrowdsourceModerationPage> {
                 if (!isInProgress)
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                    onPressed: () {
-                      context.read<CrowdsourceBloc>().add(UpdateSuggestionStatusEvent(suggestion.id, 'in_progress'));
-                    },
+                    onPressed: () => context.read<CrowdsourceBloc>().add(UpdateSuggestionStatusEvent(suggestion.id, 'in_progress')),
                     child: const Text('Aceitar Tarefa', style: TextStyle(color: Colors.white)),
                   )
                 else
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2563EB)),
-                    onPressed: () {
-                      context.read<CrowdsourceBloc>().add(UpdateSuggestionStatusEvent(suggestion.id, 'applied'));
-                    },
+                    onPressed: () => context.read<CrowdsourceBloc>().add(UpdateSuggestionStatusEvent(suggestion.id, 'applied')),
                     child: const Text('Aplicar Alteração', style: TextStyle(color: Colors.white)),
                   ),
               ],
-            )
+            ),
           ],
         ),
       ),
