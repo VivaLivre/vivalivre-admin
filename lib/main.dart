@@ -15,6 +15,14 @@ import 'features/moderation/data/repositories/admin_moderation_repository_impl.d
 import 'features/moderation/presentation/bloc/admin_moderation_bloc.dart';
 import 'features/users/presentation/pages/users_page.dart';
 import 'features/settings/presentation/pages/settings_page.dart';
+import 'features/crowdsource/domain/repositories/i_crowdsource_repository.dart';
+import 'features/crowdsource/data/repositories/crowdsource_repository_impl.dart';
+import 'features/crowdsource/presentation/bloc/crowdsource_bloc.dart';
+import 'features/crowdsource/presentation/pages/crowdsource_moderation_page.dart';
+import 'features/bathroom_management/domain/repositories/i_bathroom_management_repository.dart';
+import 'features/bathroom_management/data/repositories/bathroom_management_repository_impl.dart';
+import 'features/bathroom_management/presentation/bloc/bathroom_crud_bloc.dart';
+import 'features/bathroom_management/presentation/pages/manage_bathrooms_page.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/network/token_interceptor.dart';
@@ -51,6 +59,12 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<IAdminModerationRepository>(
           create: (context) => AdminModerationRepositoryImpl(dio: dio),
         ),
+        RepositoryProvider<ICrowdsourceRepository>(
+          create: (context) => CrowdsourceRepositoryImpl(dio: dio),
+        ),
+        RepositoryProvider<IBathroomManagementRepository>(
+          create: (context) => BathroomManagementRepositoryImpl(dio),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -72,6 +86,16 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => AdminModerationBloc(
               repository: context.read<IAdminModerationRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => CrowdsourceBloc(
+              repository: context.read<ICrowdsourceRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => BathroomCrudBloc(
+              repository: context.read<IBathroomManagementRepository>(),
             ),
           ),
         ],
@@ -100,6 +124,14 @@ class MyApp extends StatelessWidget {
             '/admin/configuracoes': (context) => const DashboardShellPage(
                   currentPath: '/admin/configuracoes',
                   child: SettingsPage(),
+                ),
+            '/admin/crowdsource': (context) => const DashboardShellPage(
+                  currentPath: '/admin/crowdsource',
+                  child: CrowdsourceModerationPage(),
+                ),
+            '/admin/locais': (context) => const DashboardShellPage(
+                  currentPath: '/admin/locais',
+                  child: ManageBathroomsPage(),
                 ),
           },
         ),
