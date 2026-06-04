@@ -42,7 +42,6 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
 
   void _navigateTo(String path) {
     if (widget.currentPath == path) return;
-    // Usar pushReplacementNamed para não empilhar dezenas de páginas ao clicar no menu
     Navigator.of(context).pushReplacementNamed(path);
   }
 
@@ -50,25 +49,24 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
     Navigator.of(context).pushReplacementNamed('/admin/login');
   }
 
-  Widget _buildSidebar(BuildContext context) {
+  Widget _buildSidebar(BuildContext context, ThemeData theme, bool isDark) {
+    final sidebarBg = isDark ? const Color(0xFF1A1D27) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF2E3347) : const Color(0xFFE5E7EB);
+    final mutedText = isDark ? const Color(0xFF8891A8) : Colors.black54;
+    final primaryText = isDark ? const Color(0xFFF1F3F9) : const Color(0xFF2D3748);
+
     return Container(
-      width: 256, // w-64
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          right: BorderSide(color: Color(0xFFE5E7EB)), // border-gray-200
-        ),
+      width: 256,
+      decoration: BoxDecoration(
+        color: sidebarBg,
+        border: Border(right: BorderSide(color: borderColor)),
       ),
       child: Column(
         children: [
-          // Logo
+          // ── Logo ──────────────────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.all(24.0),
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Color(0xFFE5E7EB)),
-              ),
-            ),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: borderColor))),
             child: Row(
               children: [
                 Container(
@@ -82,38 +80,21 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    Icons.location_on,
-                    color: Colors.white,
-                    size: 24,
-                  ),
+                  child: const Icon(Icons.location_on, color: Colors.white, size: 24),
                 ),
                 const SizedBox(width: 12),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'VivaLivre',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2D3748),
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      'Admin',
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 12,
-                      ),
-                    ),
+                    Text('VivaLivre', style: TextStyle(fontWeight: FontWeight.bold, color: primaryText, fontSize: 16)),
+                    Text('Admin', style: TextStyle(color: mutedText, fontSize: 12)),
                   ],
                 ),
               ],
             ),
           ),
 
-          // Menu de Navegação
+          // ── Navegação ─────────────────────────────────────────────────────
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16.0),
@@ -129,14 +110,16 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                     child: InkWell(
                       onTap: () {
                         if (Scaffold.of(context).hasDrawer) {
-                          Navigator.of(context).pop(); // Fechar drawer se for mobile
+                          Navigator.of(context).pop();
                         }
                         _navigateTo(item.path);
                       },
                       borderRadius: BorderRadius.circular(8),
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
-                      hoverColor: Colors.black.withValues(alpha: 0.04),
+                      hoverColor: isDark
+                          ? Colors.white.withValues(alpha: 0.04)
+                          : Colors.black.withValues(alpha: 0.04),
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
@@ -157,7 +140,7 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                             Icon(
                               item.icon,
                               size: 20,
-                              color: isActive ? Colors.white : Colors.black54,
+                              color: isActive ? Colors.white : mutedText,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -165,7 +148,7 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                                 item.label,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
-                                  color: isActive ? Colors.white : Colors.black87,
+                                  color: isActive ? Colors.white : primaryText,
                                 ),
                               ),
                             ),
@@ -195,21 +178,14 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
             ),
           ),
 
-          // Rodapé da Sidebar
+          // ── Rodapé ───────────────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.all(16.0),
-            decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Color(0xFFE5E7EB)),
-              ),
-            ),
-            child: const Center(
+            decoration: BoxDecoration(border: Border(top: BorderSide(color: borderColor))),
+            child: Center(
               child: Text(
                 'v1.0.0 • © 2026 VivaLivre',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black54,
-                ),
+                style: TextStyle(fontSize: 12, color: mutedText),
               ),
             ),
           ),
@@ -220,55 +196,54 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isDesktop = MediaQuery.of(context).size.width >= 1024;
+
+    final topbarBg = isDark ? const Color(0xFF1A1D27) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF2E3347) : const Color(0xFFE5E7EB);
+    final bgColor = isDark ? const Color(0xFF0F1117) : const Color(0xFFF9FAFB);
+    final primaryText = isDark ? const Color(0xFFF1F3F9) : const Color(0xFF2D3748);
+    final mutedText = isDark ? const Color(0xFF8891A8) : Colors.black54;
+    final iconColor = isDark ? const Color(0xFFCDD3E0) : Colors.black87;
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: bgColor,
       drawer: isDesktop
           ? null
-          : Drawer(
-              child: _buildSidebar(context),
-            ),
+          : Drawer(child: _buildSidebar(context, theme, isDark)),
       body: Row(
         children: [
-          // Sidebar Desktop
-          if (isDesktop) _buildSidebar(context),
+          if (isDesktop) _buildSidebar(context, theme, isDark),
 
-          // Conteúdo Principal
           Expanded(
             child: Column(
               children: [
-                // Topbar
+                // ── Topbar ─────────────────────────────────────────────────
                 Container(
                   height: 72,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(
-                      bottom: BorderSide(color: Color(0xFFE5E7EB)),
-                    ),
+                  decoration: BoxDecoration(
+                    color: topbarBg,
+                    border: Border(bottom: BorderSide(color: borderColor)),
                   ),
                   padding: EdgeInsets.symmetric(horizontal: isDesktop ? 32.0 : 16.0),
                   child: Row(
                     children: [
-                      // Menu Mobile
                       if (!isDesktop)
                         IconButton(
-                          icon: const Icon(Icons.menu),
-                          onPressed: () {
-                            _scaffoldKey.currentState?.openDrawer();
-                          },
+                          icon: Icon(Icons.menu, color: iconColor),
+                          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
                         ),
 
                       const Spacer(),
-                      const SizedBox(width: 16),
 
                       // Notificações
                       Stack(
                         clipBehavior: Clip.none,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.notifications_outlined, color: Colors.black87),
+                            icon: Icon(Icons.notifications_outlined, color: iconColor),
                             onPressed: () {},
                           ),
                           Positioned(
@@ -286,35 +261,34 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                         ],
                       ),
 
-                      // Avatar e Menu
+                      // Avatar + Menu
                       PopupMenuButton(
                         offset: const Offset(0, 50),
+                        color: isDark ? const Color(0xFF232634) : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: borderColor),
                         ),
                         itemBuilder: (context) => <PopupMenuEntry<String>>[
                           PopupMenuItem<String>(
                             value: 'profile',
                             child: Row(
-                              children: const [
-                                Icon(Icons.person_outline, size: 20),
-                                SizedBox(width: 12),
-                                Text('Meu Perfil'),
+                              children: [
+                                Icon(Icons.person_outline, size: 20, color: iconColor),
+                                const SizedBox(width: 12),
+                                Text('Meu Perfil', style: TextStyle(color: primaryText)),
                               ],
                             ),
                           ),
-                          const PopupMenuDivider(),
+                          PopupMenuDivider(color: borderColor),
                           PopupMenuItem<String>(
                             value: 'logout',
                             onTap: _handleLogout,
-                            child: Row(
-                              children: const [
+                            child: const Row(
+                              children: [
                                 Icon(Icons.logout, size: 20, color: Colors.red),
                                 SizedBox(width: 12),
-                                Text(
-                                  'Sair',
-                                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500),
-                                ),
+                                Text('Sair', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500)),
                               ],
                             ),
                           ),
@@ -335,40 +309,20 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Center(
-                                  child: Text(
-                                    'AD',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
+                                  child: Text('AD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                                 ),
                               ),
                               if (isDesktop) ...[
                                 const SizedBox(width: 12),
-                                const Column(
+                                Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'Admin',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF2D3748),
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Administrador',
-                                      style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 12,
-                                      ),
-                                    ),
+                                    Text('Admin', style: TextStyle(fontWeight: FontWeight.bold, color: primaryText, fontSize: 14)),
+                                    Text('Administrador', style: TextStyle(color: mutedText, fontSize: 12)),
                                   ],
                                 ),
-                              ]
+                              ],
                             ],
                           ),
                         ),
@@ -377,7 +331,7 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                   ),
                 ),
 
-                // Conteúdo Principal Renderizado
+                // ── Conteúdo ───────────────────────────────────────────────
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.all(isDesktop ? 32.0 : 16.0),

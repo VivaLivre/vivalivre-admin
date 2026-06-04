@@ -26,6 +26,8 @@ import 'features/bathroom_management/presentation/pages/manage_bathrooms_page.da
 import 'features/users/domain/repositories/i_admin_user_repository.dart';
 import 'features/users/data/repositories/admin_user_repository_impl.dart';
 import 'features/users/presentation/bloc/users_bloc_impl.dart';
+import 'core/theme/app_themes.dart';
+import 'core/theme/theme_bloc.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/network/token_interceptor.dart';
@@ -109,14 +111,17 @@ class MyApp extends StatelessWidget {
               repository: context.read<IAdminUserRepository>(),
             ),
           ),
-        ],
-        child: MaterialApp(
-          title: 'VivaLivre Admin',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2563EB)),
-            useMaterial3: true,
+          BlocProvider<ThemeBloc>(
+            create: (_) => ThemeBloc(prefs: prefs),
           ),
+        ],
+        child: BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (context, themeState) => MaterialApp(
+            title: 'VivaLivre Admin',
+            debugShowCheckedModeBanner: false,
+            theme: AppThemes.light,
+            darkTheme: AppThemes.dark,
+            themeMode: themeState.mode,
           initialRoute: '/admin/login',
           routes: {
             '/admin/login': (context) => const LoginPage(),
@@ -144,7 +149,8 @@ class MyApp extends StatelessWidget {
                   currentPath: '/admin/locais',
                   child: ManageBathroomsPage(),
                 ),
-          },
+            },
+          ),
         ),
       ),
     );
