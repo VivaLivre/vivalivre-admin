@@ -33,7 +33,9 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
 
   final List<_MenuItem> _menuItems = [
     _MenuItem(icon: Icons.dashboard, label: 'Visão Geral', path: '/admin/dashboard'),
-    _MenuItem(icon: Icons.check_box, label: 'Moderação de Locais', path: '/admin/moderacao', badge: 12),
+    _MenuItem(icon: Icons.list_alt, label: 'Todos os Locais', path: '/admin/locais'),
+    _MenuItem(icon: Icons.check_box, label: 'Banheiros Pendentes', path: '/admin/moderacao', badge: 12),
+    _MenuItem(icon: Icons.forum, label: 'Comunidade', path: '/admin/crowdsource'),
     _MenuItem(icon: Icons.people, label: 'Usuários', path: '/admin/usuarios'),
     _MenuItem(icon: Icons.settings, label: 'Configurações', path: '/admin/configuracoes'),
   ];
@@ -258,32 +260,7 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                           },
                         ),
 
-                      // Barra de Busca
-                      Expanded(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 600),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Buscar locais, usuários...',
-                              prefixIcon: const Icon(Icons.search, color: Colors.black45),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFF2563EB)),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              isDense: true,
-                            ),
-                          ),
-                        ),
-                      ),
+                      const Spacer(),
                       const SizedBox(width: 16),
 
                       // Notificações
