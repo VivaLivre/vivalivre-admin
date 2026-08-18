@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/users_bloc.dart';
@@ -307,59 +308,117 @@ class _UsersPageState extends State<UsersPage> {
                 ),
               ),
             )
-          : SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                headingRowColor: WidgetStateProperty.all(headingBg),
-                dataRowColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.hovered)) {
-                    return isDark ? const Color(0xFF232634) : const Color(0xFFF9FAFB);
-                  }
-                  return Colors.transparent;
-                }),
-                dividerThickness: isDark ? 0.3 : 1,
-                dataRowMinHeight: 72,
-                dataRowMaxHeight: 72,
-                columns: [
-                  DataColumn(label: Text('Usuário', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
-                  DataColumn(label: Text('Email', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
-                  DataColumn(label: Text('Membro desde', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
-                  DataColumn(label: Text('Status', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
-                  DataColumn(label: Text('Função', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
-                  DataColumn(label: Text('Ações', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
-                ],
-                rows: state.users.map((user) {
-                  return DataRow(cells: [
-                    DataCell(Row(children: [
-                      Container(
-                        width: 40, height: 40,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
-                              colors: [Color(0xFF2563EB), Color(0xFF1E40AF)]),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            user.name.split(' ').map((n) => n.isEmpty ? '' : n[0]).take(2).join().toUpperCase(),
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: math.max(constraints.maxWidth, 1000.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Cabeçalho
+                        Container(
+                          color: headingBg,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          child: Row(
+                            children: [
+                              Expanded(flex: 3, child: Text('Usuário', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
+                              Expanded(flex: 3, child: Text('Email', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
+                              Expanded(flex: 2, child: Text('Membro desde', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
+                              Expanded(flex: 2, child: Text('Status', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
+                              Expanded(flex: 2, child: Text('Função', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
+                              SizedBox(width: 48, child: Text('Ações', style: TextStyle(fontWeight: FontWeight.bold, color: mutedText))),
+                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(user.name, style: TextStyle(fontWeight: FontWeight.w500, color: primaryText)),
-                    ])),
-                    DataCell(Text(user.email, style: TextStyle(color: mutedText))),
-                    DataCell(Text(_formatDate(user.createdAt), style: TextStyle(color: mutedText, fontSize: 13))),
-                    DataCell(_buildStatusBadge(user.status, isDark)),
-                    DataCell(_buildRoleBadge(user.role, isDark, mutedText)),
-                    DataCell(IconButton(
-                      icon: Icon(Icons.more_vert, color: mutedText),
-                      tooltip: 'Ações',
-                      onPressed: () => _showStatusMenu(context, user),
-                    )),
-                  ]);
-                }).toList(),
-              ),
+                        Divider(height: 1, thickness: 1, color: cardBorder),
+                        // Linhas
+                        ...state.users.map((user) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              border: Border(bottom: BorderSide(color: cardBorder, width: 0.5)),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                hoverColor: isDark ? const Color(0xFF232634) : const Color(0xFFF9FAFB),
+                                onTap: () {},
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                  child: Row(
+                                    children: [
+                                      // Usuário
+                                      Expanded(
+                                        flex: 3,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 40, height: 40,
+                                              decoration: const BoxDecoration(
+                                                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+                                                    colors: [Color(0xFF2563EB), Color(0xFF1E40AF)]),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  user.name.split(' ').map((n) => n.isEmpty ? '' : n[0]).take(2).join().toUpperCase(),
+                                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(child: Text(user.name, style: TextStyle(fontWeight: FontWeight.w500, color: primaryText), overflow: TextOverflow.ellipsis)),
+                                          ],
+                                        ),
+                                      ),
+                                      // Email
+                                      Expanded(
+                                        flex: 3,
+                                        child: Text(user.email, style: TextStyle(color: mutedText), overflow: TextOverflow.ellipsis),
+                                      ),
+                                      // Membro desde
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(_formatDate(user.createdAt), style: TextStyle(color: mutedText, fontSize: 13)),
+                                      ),
+                                      // Status
+                                      Expanded(
+                                        flex: 2,
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: _buildStatusBadge(user.status, isDark),
+                                        ),
+                                      ),
+                                      // Função
+                                      Expanded(
+                                        flex: 2,
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: _buildRoleBadge(user.role, isDark, mutedText),
+                                        ),
+                                      ),
+                                      // Ações
+                                      SizedBox(
+                                        width: 48,
+                                        child: IconButton(
+                                          icon: Icon(Icons.more_vert, color: mutedText),
+                                          tooltip: 'Ações',
+                                          onPressed: () => _showStatusMenu(context, user),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
     );
   }

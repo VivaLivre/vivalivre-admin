@@ -48,8 +48,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Inicializamos uma instância simples do Dio e adicionamos o interceptor de JWT
-    final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
+    String baseUrl = const String.fromEnvironment(
+      'API_URL',
+      defaultValue: 'https://vivalivre-backend-production.up.railway.app',
+    );
+    final dio = Dio(BaseOptions(baseUrl: baseUrl));
     dio.interceptors.add(TokenInterceptor(prefs: prefs));
 
     return MultiRepositoryProvider(

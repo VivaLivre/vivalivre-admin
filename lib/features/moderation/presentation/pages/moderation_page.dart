@@ -97,25 +97,8 @@ class _ModerationPageState extends State<ModerationPage> {
 
                 return Column(
                   children: [
-                    // Stat cards
-                    LayoutBuilder(builder: (context, constraints) {
-                      final count = constraints.maxWidth >= 1024 ? 4 : (constraints.maxWidth >= 600 ? 2 : 1);
-                      return GridView.count(
-                        crossAxisCount: count,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 2.5,
-                        children: [
-                          _buildStatCard(isDark, 'Pendentes', '${sugestoes.length}', Icons.access_time, const Color(0xFF2563EB), const Color(0xFF1E2D4A), const Color(0xFFE0E7FF)),
-                          _buildStatCard(isDark, 'Aprovados Hoje', '24', Icons.check, const Color(0xFF10B981), const Color(0xFF0F2A1E), const Color(0xFFD1FAE5)),
-                          _buildStatCard(isDark, 'Rejeitados Hoje', '3', Icons.close, const Color(0xFFEF4444), const Color(0xFF2A1010), const Color(0xFFFEE2E2)),
-                          _buildStatCard(isDark, 'Total de Locais', '1.247', Icons.location_on, isDark ? const Color(0xFFF1F3F9) : const Color(0xFF2D3748), const Color(0xFF232634), const Color(0xFFF3F4F6)),
-                        ],
-                      );
-                    }),
-                    const SizedBox(height: 24),
+                    // Stat cards removidos (continham dados mocados)
+
 
                     // Filtros
                     Container(
@@ -191,39 +174,6 @@ class _ModerationPageState extends State<ModerationPage> {
     );
   }
 
-  Widget _buildStatCard(bool isDark, String title, String value, IconData icon, Color iconColor, Color darkBg, Color lightBg) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1A1D27) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? const Color(0xFF2E3347) : const Color(0xFFE5E7EB)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(title, style: TextStyle(color: isDark ? const Color(0xFF8891A8) : Colors.black54, fontSize: 14)),
-              const SizedBox(height: 4),
-              Text(value, style: TextStyle(color: iconColor, fontSize: 28, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: isDark ? darkBg : lightBg,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: iconColor),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildFilterButton(String label, String value, bool isDark) {
     final isSelected = _filtroAtual == value;
