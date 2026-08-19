@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
-import 'features/approvals/domain/repositories/admin_repository.dart';
-import 'features/approvals/presentation/bloc/admin_bloc.dart';
+
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/dashboard/presentation/pages/dashboard_shell_page.dart';
 import 'features/dashboard/presentation/pages/dashboard_overview_page.dart';
@@ -35,6 +34,8 @@ import 'features/auth/domain/repositories/i_auth_repository.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 
+final GlobalKey<NavigatorState> globalNavigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
@@ -60,7 +61,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<IAuthRepository>(
           create: (context) => AuthRepositoryImpl(dio: dio, prefs: prefs),
         ),
-        RepositoryProvider(create: (context) => AdminRepository()),
+
         RepositoryProvider<DashboardRepository>(
           create: (context) => DashboardRepositoryImpl(dio: dio),
         ),
@@ -82,11 +83,6 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => AuthBloc(
               repository: context.read<IAuthRepository>(),
-            ),
-          ),
-          BlocProvider(
-            create: (context) => AdminBloc(
-              repository: context.read<AdminRepository>(),
             ),
           ),
           BlocProvider(
@@ -125,6 +121,7 @@ class MyApp extends StatelessWidget {
             theme: AppThemes.light,
             darkTheme: AppThemes.dark,
             themeMode: themeState.mode,
+            navigatorKey: globalNavigatorKey,
           initialRoute: '/admin/login',
           routes: {
             '/admin/login': (context) => const LoginPage(),
