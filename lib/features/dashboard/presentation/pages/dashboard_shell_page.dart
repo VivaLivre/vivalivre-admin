@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
 
 class DashboardShellPage extends StatefulWidget {
   final Widget child;
@@ -293,38 +296,55 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                             ),
                           ),
                         ],
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [Color(0xFF2563EB), Color(0xFF1E40AF)],
+                        child: BlocBuilder<AuthBloc, AuthState>(
+                          builder: (context, authState) {
+                            String name = 'Admin';
+                            String initials = 'AD';
+                            if (authState is AuthSuccess) {
+                              name = authState.user.name;
+                              if (name.isNotEmpty) {
+                                final parts = name.trim().split(RegExp(r'\s+'));
+                                if (parts.length > 1) {
+                                  initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+                                } else {
+                                  initials = parts[0][0].toUpperCase();
+                                }
+                              }
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: const BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [Color(0xFF2563EB), Color(0xFF1E40AF)],
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Text(initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                                    ),
                                   ),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Center(
-                                  child: Text('AD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                                ),
-                              ),
-                              if (isDesktop) ...[
-                                const SizedBox(width: 12),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Admin', style: TextStyle(fontWeight: FontWeight.bold, color: primaryText, fontSize: 14)),
-                                    Text('Administrador', style: TextStyle(color: mutedText, fontSize: 12)),
+                                  if (isDesktop) ...[
+                                    const SizedBox(width: 12),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(name, style: TextStyle(fontWeight: FontWeight.bold, color: primaryText, fontSize: 14)),
+                                        Text('Administrador', style: TextStyle(color: mutedText, fontSize: 12)),
+                                      ],
+                                    ),
                                   ],
-                                ),
-                              ],
-                            ],
-                          ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
