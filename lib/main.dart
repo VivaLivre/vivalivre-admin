@@ -34,6 +34,8 @@ import 'features/auth/domain/repositories/i_auth_repository.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 
+final GlobalKey<NavigatorState> globalNavigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
@@ -119,6 +121,7 @@ class MyApp extends StatelessWidget {
             theme: AppThemes.light,
             darkTheme: AppThemes.dark,
             themeMode: themeState.mode,
+            navigatorKey: globalNavigatorKey,
           initialRoute: '/admin/login',
           routes: {
             '/admin/login': (context) => const LoginPage(),
