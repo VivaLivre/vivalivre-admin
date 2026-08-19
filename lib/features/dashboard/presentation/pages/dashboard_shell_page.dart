@@ -298,6 +298,33 @@ class _DashboardShellPageState extends State<DashboardShellPage> {
                         ],
                         child: BlocBuilder<AuthBloc, AuthState>(
                           builder: (context, authState) {
+                            if (authState is AuthLoading || authState is AuthInitial) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 36,
+                                      height: 36,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB)),
+                                    ),
+                                    if (isDesktop) ...[
+                                      const SizedBox(width: 12),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(width: 80, height: 14, color: isDark ? const Color(0xFF2E3347) : Colors.grey.shade300),
+                                          const SizedBox(height: 4),
+                                          Container(width: 100, height: 12, color: isDark ? const Color(0xFF2E3347) : Colors.grey.shade300),
+                                        ],
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              );
+                            }
+
                             String name = 'Admin';
                             String initials = 'AD';
                             if (authState is AuthSuccess) {
